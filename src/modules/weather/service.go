@@ -1,4 +1,4 @@
-package services
+package weather
 
 import (
 	"errors"
@@ -6,24 +6,28 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-
-	"github.com/renatorrocha/weather-api-cached/src/config"
 )
 
-func GetWeather(city string) (string, error) {
-	baseUrl := config.GetEnv("OPENWEATHER_URL", "")
-	apiKey := config.GetEnv("OPENWEATHER_API_KEY", "")
+type WeatherService interface {
+	Get(city string) (string, error)
+}
 
-	if baseUrl == "" || apiKey == "" {
-		return "", errors.New("OPENWEATHER_URL or OPENWEATHER_API_KEY is not set")
+type weatherServiceImpl struct {
+	apiKey string
+}
+
+func NewWeatherService(apiKey string) WeatherService {
+	return &weatherServiceImpl{
+		apiKey: apiKey,
 	}
+}
 
+func (s *weatherServiceImpl) Get(city string) (string, error) {
 	cityParam := url.QueryEscape(city)
 
-	fullUrl := fmt.Sprintf("%s/data/2.5/weather?q=%s&appid=%s", baseUrl, cityParam, apiKey)
+	fullUrl := fmt.Sprintf("https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", cityParam, s.apiKey)
 
 	response, err := http.Get(fullUrl)
-
 	if err != nil {
 		return "", err
 	}
@@ -33,11 +37,9 @@ func GetWeather(city string) (string, error) {
 	if response.StatusCode != 200 {
 		body, _ := io.ReadAll(response.Body)
 		return "", errors.New("error fetching weather data: " + string(body))
-
 	}
 
 	body, err := io.ReadAll(response.Body)
-
 	if err != nil {
 		return "", err
 	}

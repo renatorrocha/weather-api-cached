@@ -9,7 +9,6 @@ import (
 
 type Config struct {
 	OPENWEATHER_API_KEY string
-	OPENWEATHER_URL     string
 }
 
 var appConfig *Config
@@ -23,7 +22,6 @@ func Load() {
 
 	appConfig = &Config{
 		OPENWEATHER_API_KEY: GetEnv("OPENWEATHER_API_KEY", ""),
-		OPENWEATHER_URL:     GetEnv("OPENWEATHER_URL", ""),
 	}
 }
 
