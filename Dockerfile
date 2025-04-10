@@ -9,8 +9,6 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY .env .env
-
 COPY src/ ./src/
 
 RUN go build -o main ./src
