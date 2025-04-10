@@ -11,6 +11,12 @@ func main() {
 
 	app := fiber.New()
 
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status": "ok",
+		})
+	})
+
 	// inject dependencies
 	weatherDeps := weather.WeatherDeps{
 		Service: weather.NewWeatherService(config.GetEnv("OPENWEATHER_API_KEY", "")),
